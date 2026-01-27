@@ -157,9 +157,142 @@ FILESYSTEM_CLOUD=s3
 #AWS_ENDPOINT=
 #AWS_USE_PATH_STYLE_ENDPOINT=false
 ```
+Note que no .env gerado existe um atributo chamado `APP_KEY`, logo é necessário gerar uma chave para que a aplicação funcione corretamente.
 
+```bash
+php artisan key:generate
+```
+Agora é necessário dizer para a sua aplicação que alguns arquivos que não são públicos sejam expostos, então o comando a servur serve para criar um link simbólico para o acesso a tais arquivos:
 
+```bash
+php artisan storage:link
+```
+Feito isto é necessário rodar as migrations para que todas as configurações do banco estejam presente também no nosso espaço de desenvolvimento, por isso devemos configurar o endereço corretamente dos serviços no arquivo .env, segue um exemplo funcional abaixo.
 
-inicie o servidor, queue e o schedule
+```bash
+APP_NAME="Pixelfed"
+APP_ENV="local"
+APP_KEY=gere_a_chave_com_o_comando_indicado_anteriormente
+APP_DEBUG="true"
+
+# Instance Configuration
+OPEN_REGISTRATION="false"
+ENFORCE_EMAIL_VERIFICATION="false"
+PF_MAX_USERS="1000"
+OAUTH_ENABLED="true"
+ENABLE_CONFIG_CACHE="true"
+INSTANCE_DISCOVER_PUBLIC="true"
+
+# Media Configuration
+PF_OPTIMIZE_IMAGES="true"
+IMAGE_QUALITY="80"
+MAX_PHOTO_SIZE="15000"
+MAX_CAPTION_LENGTH="500"
+MAX_ALBUM_LENGTH="4"
+
+# Instance URL Configuration
+APP_URL="http://localhost"
+APP_DOMAIN="localhost"
+ADMIN_DOMAIN="localhost"
+SESSION_DOMAIN="localhost"
+TRUST_PROXIES="*"
+FORCE_HTTPS_URLS=false
+SESSION_SECURE_COOKIE=false
+
+# Database Configuration
+DB_CONNECTION="mariadb"
+DB_HOST="127.0.0.1"
+DB_PORT="3306"
+DB_DATABASE="pixelfed"
+DB_USERNAME="pixelfed"
+DB_PASSWORD="senha_criada_para_o_usuario_no_banco_de_dados"
+
+# Redis Configuration
+REDIS_CLIENT="predis"
+REDIS_SCHEME="tcp"
+REDIS_HOST="127.0.0.1"
+REDIS_PASSWORD="null"
+REDIS_PORT="6379"
+
+# Laravel Configuration
+SESSION_DRIVER="redis"
+CACHE_DRIVER="redis"
+QUEUE_DRIVER="redis"
+BROADCAST_DRIVER="redis"
+LOG_CHANNEL="stack"
+HORIZON_PREFIX="horizon-"
+
+# ActivityPub Configuration
+ACTIVITY_PUB="false"
+AP_REMOTE_FOLLOW="false"
+AP_INBOX="false"
+AP_OUTBOX="false"
+AP_SHAREDINBOX="false"
+
+# Experimental Configuration
+EXP_EMC="true"
+
+## Mail Configuration (Post-Installer)
+MAIL_DRIVER=log
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="pixelfed@example.com"
+MAIL_FROM_NAME="Pixelfed"
+
+## S3 Configuration (Post-Installer)
+PF_ENABLE_CLOUD=false
+FILESYSTEM_CLOUD=s3
+#AWS_ACCESS_KEY_ID=
+#AWS_SECRET_ACCESS_KEY=
+#AWS_DEFAULT_REGION=
+#AWS_BUCKET=<BucketName>
+#AWS_URL=
+#AWS_ENDPOINT=
+#AWS_USE_PATH_STYLE_ENDPOINT=false
+
+FORCE_HTTPS_URLS=false
+
+# Chat e Notificações
+PF_CHAT_ENABLED=true
+PF_CHAT_SYSTEM=redis
+PF_CHAT_NOTIFICATIONS=true
+PF_CHAT_MAX_LENGTH=1000
+PF_CHAT_RATE_LIMIT=10
+
+# Follow System
+PF_FOLLOW_AUTO_ACCEPT=true
+PF_FOLLOW_RATE_LIMIT=30
+PF_FOLLOW_DOMAIN_BLOCKLIST=
+
+# Redis para broadcasting
+BROADCAST_DRIVER=redis
+REDIS_BROADCAST_HOST=127.0.0.1
+REDIS_BROADCAST_PORT=6379
+
+# Cache para contadores
+PF_CACHE_FOLLOW_COUNTS=true
+PF_CACHE_FOLLOW_TTL=300
+
+# API e Eventos
+PF_API_RATE_LIMIT=300
+PF_EVENTS_ENABLED=true
+PF_REAL_TIME_UPDATES=true
+```
+Agora vamos rodar as migrations via Artisan, lembre-se que o banco deve já ter sido criado previamente e deve estar corretamente especificado no .env, utilize o seguinte comando:
+
+```bash
+php artisan migrations --force
+```
+Migrations realizadas. Tudo pronto para iniciar o seu serviço local com o Pixelfed.
+
+Tudo pronto para iniciar o servidor e começar a desenvolvimento da sua aplicação! Utilize o comando de inicialização do servidor via Artisan.
+
+```bash
+php artisan serve --host=0.0.0.0
+```
+O parâmetro `--host`, delimita os valores que endereçam a aplicação no nosso servidor artisan. Caso não fosse definido tal parâmetro haveria um conflito, pois especificamos no `.env` que a aplicação está endereçada por localhost, logo o servidor seria incapaz de localizar o localhost, por seu padrão de endereçamento ser 127.0.0.1. Assim também se faz necessário especificar a porta.
 
 reconfigure a tabela statuses
