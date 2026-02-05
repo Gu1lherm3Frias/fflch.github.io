@@ -162,11 +162,7 @@ Note que no .env gerado existe um atributo chamado `APP_KEY`, logo é necessári
 ```bash
 php artisan key:generate
 ```
-Agora é necessário dizer para a sua aplicação que alguns arquivos que não são públicos sejam expostos, então o comando a servur serve para criar um link simbólico para o acesso a tais arquivos:
 
-```bash
-php artisan storage:link
-```
 Feito isto é necessário rodar as migrations para que todas as configurações do banco estejam presente também no nosso espaço de desenvolvimento, por isso devemos configurar o endereço corretamente dos serviços no arquivo .env, segue um exemplo funcional abaixo.
 
 ```bash
@@ -191,7 +187,7 @@ MAX_CAPTION_LENGTH="500"
 MAX_ALBUM_LENGTH="4"
 
 # Instance URL Configuration
-APP_URL="http://localhost"
+APP_URL="http://localhost:8000"
 APP_DOMAIN="localhost"
 ADMIN_DOMAIN="localhost"
 SESSION_DOMAIN="localhost"
@@ -253,8 +249,6 @@ FILESYSTEM_CLOUD=s3
 #AWS_ENDPOINT=
 #AWS_USE_PATH_STYLE_ENDPOINT=false
 
-FORCE_HTTPS_URLS=false
-
 # Chat e Notificações
 PF_CHAT_ENABLED=true
 PF_CHAT_SYSTEM=redis
@@ -281,6 +275,8 @@ PF_API_RATE_LIMIT=300
 PF_EVENTS_ENABLED=true
 PF_REAL_TIME_UPDATES=true
 ```
+É muito importante que a variável `FORCE_HTTPS_URLS` seja false. O pixelfed tem restrições de domínio para Https que são chatas e atrapalham no desenvolvimento local.
+
 Agora vamos rodar as migrations via Artisan, lembre-se que o banco deve já ter sido criado previamente e deve estar corretamente especificado no .env, utilize o seguinte comando:
 
 ```bash
@@ -288,11 +284,34 @@ php artisan migrations --force
 ```
 Migrations realizadas. Tudo pronto para iniciar o seu serviço local com o Pixelfed.
 
-Tudo pronto para iniciar o servidor e começar a desenvolvimento da sua aplicação! Utilize o comando de inicialização do servidor via Artisan.
+Tudo pronto para iniciar o servidor e começar a desenvolvimento da sua aplicação! Utilize o comando a seguir para criar chaves de autenticação de oauth:
+
+```bash
+php artisan passport:keys --force
+```
+
+Agora é necessário dizer para a sua aplicação que alguns arquivos que não são públicos sejam expostos, então o comando a serguir serve para criar um link simbólico para o acesso a tais arquivos:
+
+```bash
+php artisan storage:link
+```
+
+Agora utilize o comando de inicialização do servidor via Artisan para que possamos testar a aplicação.
 
 ```bash
 php artisan serve --host=0.0.0.0
 ```
 O parâmetro `--host`, delimita os valores que endereçam a aplicação no nosso servidor artisan. Caso não fosse definido tal parâmetro haveria um conflito, pois especificamos no `.env` que a aplicação está endereçada por localhost, logo o servidor seria incapaz de localizar o localhost, por seu padrão de endereçamento ser 127.0.0.1. Assim também se faz necessário especificar a porta.
 
-reconfigure a tabela statuses
+Agora vamos criar um usuário admin e um usuário comum para os testes. 
+
+Utilizando o comando:
+
+```bash
+php artisan user:create
+```
+Siga o que a imagem a baixo indica para criar um usuário.
+
+![user_create_img](/assets/images/pixelfed/user_create.png)
+
+Para criar um usuário sem as autorizações de admin basta responder não na criação do mesmo.
